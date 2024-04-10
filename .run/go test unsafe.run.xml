@@ -1,0 +1,13 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="go test unsafe" type="GoTestRunConfiguration" factoryName="Go Test">
+    <module name="middleware" />
+    <working_directory value="$PROJECT_DIR$" />
+    <go_parameters value="-race -tags=cors_unsafe" />
+    <kind value="PACKAGE" />
+    <package value="github.com/go-pogo/middleware" />
+    <directory value="$PROJECT_DIR$" />
+    <filePath value="$PROJECT_DIR$" />
+    <framework value="gotest" />
+    <method v="2" />
+  </configuration>
+</component>
