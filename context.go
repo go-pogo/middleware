@@ -10,14 +10,14 @@ import (
 )
 
 func WithContextValue(key, value any) Wrapper {
-	return WrapperFunc(func(next http.HandlerFunc) http.Handler {
+	return WrapperFunc(func(next http.Handler) http.Handler {
 		return ContextValue(key, value, next)
 	})
 }
 
-func ContextValue(key, value any, next http.HandlerFunc) http.Handler {
+func ContextValue(key, value any, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(wri http.ResponseWriter, req *http.Request) {
-		next(
+		next.ServeHTTP(
 			wri,
 			req.WithContext(context.WithValue(req.Context(), key, value)),
 		)

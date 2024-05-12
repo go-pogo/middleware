@@ -16,11 +16,9 @@ import (
 var xForwardedFor = http.CanonicalHeaderKey("X-Forwarded-For")
 var xRealIP = http.CanonicalHeaderKey("X-Real-IP")
 
-// WithRealIP adds middleware that sets the RemoteAddr field of the http.Request
-// to the value of the client's real IP address, using RealIP.
-func WithRealIP() Wrapper {
-	return WrapperFunc(RealIP)
-}
+// WithRealIP adds middleware that sets the [RemoteAddr] field of the
+// [http.Request] to the value of the client's real IP address, using [RealIP].
+func WithRealIP() Wrapper { return WrapperFunc(RealIP) }
 
 // RealIP is a middleware that sets a http.Request's RemoteAddr to the results
 // of parsing either the X-Forwarded-For header or the X-Real-IP header (in
@@ -39,12 +37,12 @@ func WithRealIP() Wrapper {
 // how you're using RemoteAddr, vulnerable to an attack of some sort).
 //
 // This function is based on the RealIP middleware from the Goji web framework.
-func RealIP(next http.HandlerFunc) http.Handler {
+func RealIP(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if rip := realIP(r); rip != "" {
 			r.RemoteAddr = rip
 		}
-		next(w, r)
+		next.ServeHTTP(w, r)
 	})
 }
 

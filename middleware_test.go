@@ -16,16 +16,16 @@ func TestWrap(t *testing.T) {
 		http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 			_, _ = w.Write([]byte("c"))
 		}),
-		WrapperFunc(func(next http.HandlerFunc) http.Handler {
+		WrapperFunc(func(next http.Handler) http.Handler {
 			return http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 				_, _ = w.Write([]byte("a"))
-				next(w, nil)
+				next.ServeHTTP(w, nil)
 			})
 		}),
-		WrapperFunc(func(next http.HandlerFunc) http.Handler {
+		WrapperFunc(func(next http.Handler) http.Handler {
 			return http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 				_, _ = w.Write([]byte("b"))
-				next(w, nil)
+				next.ServeHTTP(w, nil)
 			})
 		}),
 	)

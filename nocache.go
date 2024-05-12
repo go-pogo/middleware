@@ -33,11 +33,9 @@ var etagHeaders = []string{
 	"If-Unmodified-Since",
 }
 
-// WithNoCache adds middleware that sets headers to prevent caching of the response,
-// using NoCache.
-func WithNoCache() Wrapper {
-	return WrapperFunc(NoCache)
-}
+// WithNoCache adds middleware that sets headers to prevent caching of the
+// response, using [NoCache].
+func WithNoCache() Wrapper { return WrapperFunc(NoCache) }
 
 // NoCache is a simple piece of middleware that sets a number of HTTP headers
 // to prevent a router from being cached by an upstream proxy and/or client.
@@ -50,7 +48,7 @@ func WithNoCache() Wrapper {
 //	Pragma: no-cache (for HTTP/1.0 proxies/clients)
 //
 // This function is based on the NoCache middleware from the Goji web framework.
-func NoCache(next http.HandlerFunc) http.Handler {
+func NoCache(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Delete any ETag headers that may have been set
 		for _, v := range etagHeaders {
@@ -64,6 +62,6 @@ func NoCache(next http.HandlerFunc) http.Handler {
 			w.Header().Set(k, v)
 		}
 
-		next(w, r)
+		next.ServeHTTP(w, r)
 	})
 }

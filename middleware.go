@@ -8,43 +8,43 @@ import (
 	"net/http"
 )
 
-// Wrapper wraps a http.HandlerFunc with additional logic and returns a new
-// http.Handler.
 type Wrapper interface {
-	Wrap(next http.HandlerFunc) http.Handler
+	// Wrap wraps the [http.Handler] with additional logic.
+	Wrap(next http.Handler) http.Handler
 }
 
 var _ Wrapper = (*WrapperFunc)(nil)
 
-//goland:noinspection GoNameStartsWithPackageName
-type WrapperFunc func(next http.HandlerFunc) http.Handler
+type WrapperFunc func(next http.Handler) http.Handler
 
-func (fn WrapperFunc) Wrap(next http.HandlerFunc) http.Handler { return fn(next) }
+func (fn WrapperFunc) Wrap(next http.Handler) http.Handler { return fn(next) }
 
-// Wrap http.Handler h with the provided Wrapper.
+// Wrap [http.Handler] h with additional logic via the provided [Wrapper]s.
 func Wrap(handler http.Handler, wrap ...Wrapper) http.Handler {
 	for i := len(wrap) - 1; i >= 0; i-- {
-		handler = wrap[i].Wrap(handler.ServeHTTP)
+		handler = wrap[i].Wrap(handler)
 	}
 	return handler
 }
 
 var _ Wrapper = (*Middleware)(nil)
 
+// Middleware consists of multiple [Wrapper]s which can be wrapped around a
+// [http.Handler] using [Wrap].
 type Middleware []Wrapper
 
-func (m Middleware) Wrap(next http.HandlerFunc) http.Handler {
+func (m Middleware) Wrap(next http.Handler) http.Handler {
 	return Wrap(next, m...)
 }
 
 var _ Wrapper = (*HandlerFunc)(nil)
 
-// HandlerFunc is a http.HandlerFunc which implements the Wrapper interface.
+// HandlerFunc is a [http.Handler] which implements the [Wrapper] interface.
 type HandlerFunc http.HandlerFunc
 
-func (fn HandlerFunc) Wrap(next http.HandlerFunc) http.Handler {
+func (fn HandlerFunc) Wrap(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(wri http.ResponseWriter, req *http.Request) {
 		fn(wri, req)
-		next(wri, req)
+		next.ServeHTTP(wri, req)
 	})
 }
